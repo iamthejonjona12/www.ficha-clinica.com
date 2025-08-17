@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha Clínica Veterinaria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .wheel-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            transition: all 0.3s ease;
+        }
+        .wheel {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00796b, #4db6ac);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .wheel.open {
+            background: linear-gradient(45deg, #004d40, #00897b);
+        }
+        .wheel-items {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .wheel.open .wheel-items {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .wheel-item {
+            position: absolute;
+            width: 140px;
+            height: 40px;
+            text-align: center;
+            background: #ffffff;
+            color: #004d40;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            transform-origin: center center;
+            transform: scale(0);
+        }
+        .wheel.open .wheel-item {
+            transform: scale(1);
+        }
+        .wheel-item:hover {
+            background: #e0f7fa;
+            transform: scale(1.1);
+        }
+        .wheel-item.active {
+            background: #b2dfdb;
+            color: #004d40;
+            font-weight: 700;
+        }
+        h2 {
+            color: #00695c;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .info-message {
+            text-align: center;
+            color: #004d40;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: #004d40;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #b0bec5;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8fafc;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00796b;
+            box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
+        }
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .button-group button {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #0288d1, #4fc3f7);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .button-group button:hover {
+            background: linear-gradient(45deg, #01579b, #0288d1);
+            transform: translateY(-2px);
+        }
+        .search-screen, .consults-screen {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background: #e0f7fa;
+            color: #004d40;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f1f8e9;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .wheel-container {
+                width: 80px;
+                height: 80px;
+            }
+            .wheel {
+                width: 80px;
+                height: 80px;
+                font-size: 14px;
+            }
+            .wheel-item {
+                width: 120px;
+                height: 35px;
+                font-size: 12px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="wheel-container">
+            <div class="wheel" id="wheel" onclick="toggleWheel()">
+                Menú
+                <div class="wheel-items">
+                    <div class="wheel-item active" style="transform: rotate(0deg) translate(120px) rotate(0deg);" onclick="showScreen('main', event)">Ficha Principal</div>
+                    <div class="wheel-item" style="transform: rotate(60deg) translate(120px) rotate(-60deg);" onclick="showScreen('search', event)">Buscar</div>
+                    <div class="wheel-item" style="transform: rotate(120deg) translate(120px) rotate(-120deg);" onclick="showScreen('consults', event)">Abrir Más Consultas</div>
+                    <div class="wheel-item" style="transform: rotate(180deg) translate(120px) rotate(-180deg);" onclick="saveForm(event)">Guardar</div>
+                    <div class="wheel-item" style="transform: rotate(240deg) translate(120px) rotate(-240deg);" onclick="exportToExcel(event)">Exportar a Excel</div>
+                    <div class="wheel-item" style="transform: rotate(300deg) translate(120px) rotate(-300deg);" onclick="importFromExcel(event)">Importar desde Excel</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla Principal -->
+        <div id="main-screen">
+            <h2>Ficha Clínica Veterinaria</h2>
+            <p class="info-message">Utiliza el menú radial para guardar, exportar o importar datos.</p>
+            <form id="pet-form">
+                <div class="form-group">
+                    <label>Nombre del Dueño</label>
+                    <input type="text" id="owner-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Dirección</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre de la Mascota</label>
+                    <input type="text" id="pet-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Color de la Mascota</label>
+                    <input type="text" id="pet-color" required>
+                </div>
+                <div class="form-group">
+                    <label>Especie</label>
+                    <input type="text" id="species" required>
+                </div>
+                <div class="form-group">
+                    <label>Raza</label>
+                    <input type="text" id="breed" required>
+                </div>
+                <div class="form-group">
+                    <label>Edad (años)</label>
+                    <input type="number" id="age" required>
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" step="0.1" id="weight" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Consulta</label>
+                    <input type="date" id="consult-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Anamnesis</label>
+                    <textarea id="anamnesis" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Diagnóstico</label>
+                    <textarea id="diagnosis" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tratamiento</label>
+                    <textarea id="treatment" required></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- Pantalla de Búsqueda -->
+        <div id="search-screen" class="search-screen">
+            <h2>Buscar Fichas</h2>
+            <div class="form-group">
+                <label>Filtrar por Nombre de Mascota o Dueño</label>
+                <input type="text" id="search-input" placeholder="Escribe para filtrar...">
+            </div>
+            <table id="search-results">
+                <thead>
+                    <tr>
+                        <th>Nombre Mascota</th>
+                        <th>Nombre Dueño</th>
+                        <th>Fecha Consulta</th>
+                    </tr>
+                </thead>
+                <tbody id="search-results-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Pantalla de Consultas Adicionales -->
+        <div id="consults-screen" class="consults-screen">
+            <h2>Registrar Nueva Consulta</h2>
+            <form id="consult-form">
+                <div class="form-group">
+                    <label>Nombre de la Mascota</label>
+                    <select id="consult-pet-name" required>
+                        <option value="">Selecciona una mascota</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Consulta</label>
+                    <input type="date" id="consult-date-new" required>
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" step="0.1" id="consult-weight" required>
+                </div>
+                <div class="form-group">
+                    <label>Edad (años)</label>
+                    <input type="number" id="consult-age" required>
+                </div>
+                <div class="form-group">
+                    <label>Anamnesis</label>
+                    <textarea id="consult-anamnesis" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Diagnóstico</label>
+                    <textarea id="consult-diagnosis" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tratamiento</label>
+                    <textarea id="consult-treatment" required></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Guardar Consulta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let records = JSON.parse(localStorage.getItem('vetRecords')) || [];
+        let isWheelOpen = false;
+
+        function toggleWheel() {
+            const wheel = document.getElementById('wheel');
+            isWheelOpen = !isWheelOpen;
+            wheel.classList.toggle('open');
+        }
+
+        function showScreen(screenId, event) {
+            if (event) event.stopPropagation();
+            document.getElementById('main-screen').style.display = screenId === 'main' ? 'block' : 'none';
+            document.getElementById('search-screen').style.display = screenId === 'search' ? 'block' : 'none';
+            document.getElementById('consults-screen').style.display = screenId === 'consults' ? 'block' : 'none';
+            updateWheelActive(screenId);
+            if (isWheelOpen) toggleWheel();
+            if (screenId === 'consults') {
+                populatePetDropdown();
+            }
+            if (screenId === 'search') {
+                performSearch();
+            }
+        }
+
+        function updateWheelActive(screenId) {
+            const items = document.querySelectorAll('.wheel-item');
+            items.forEach(item => item.classList.remove('active'));
+            if (screenId === 'main') items[0].classList.add('active');
+            else if (screenId === 'search') items[1].classList.add('active');
+            else if (screenId === 'consults') items[2].classList.add('active');
+        }
+
+        function saveForm(event) {
+            if (event) event.stopPropagation();
+            const form = document.getElementById('pet-form');
+            if (form.checkValidity()) {
+                const record = {
+                    id: Date.now(),
+                    type: 'main',
+                    ownerName: document.getElementById('owner-name').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    petName: document.getElementById('pet-name').value,
+                    petColor: document.getElementById('pet-color').value,
+                    species: document.getElementById('species').value,
+                    breed: document.getElementById('breed').value,
+                    age: document.getElementById('age').value,
+                    weight: document.getElementById('weight').value,
+                    consultDate: document.getElementById('consult-date').value,
+                    anamnesis: document.getElementById('anamnesis').value,
+                    diagnosis: document.getElementById('diagnosis').value,
+                    treatment: document.getElementById('treatment').value
+                };
+                records.push(record);
+                localStorage.setItem('vetRecords', JSON.stringify(records));
+                alert('Ficha guardada exitosamente');
+                form.reset();
+                if (isWheelOpen) toggleWheel();
+            } else {
+                alert('Por favor, completa todos los campos requeridos.');
+            }
+        }
+
+        document.getElementById('consult-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const consult = {
+                id: Date.now(),
+                type: 'consult',
+                petName: document.getElementById('consult-pet-name').value,
+                consultDate: document.getElementById('consult-date-new').value,
+                weight: document.getElementById('consult-weight').value,
+                age: document.getElementById('consult-age').value,
+                anamnesis: document.getElementById('consult-anamnesis').value,
+                diagnosis: document.getElementById('consult-diagnosis').value,
+                treatment: document.getElementById('consult-treatment').value
+            };
+            records.push(consult);
+            localStorage.setItem('vetRecords', JSON.stringify(records));
+            alert('Consulta adicional guardada exitosamente');
+            this.reset();
+            populatePetDropdown();
+        });
+
+        function populatePetDropdown() {
+            const dropdown = document.getElementById('consult-pet-name');
+            dropdown.innerHTML = '<option value="">Selecciona una mascota</option>';
+            const uniquePets = [...new Set(records.filter(record => record.type === 'main').map(record => record.petName).filter(name => name))];
+            uniquePets.forEach(pet => {
+                const option = document.createElement('option');
+                option.value = pet;
+                option.textContent = pet;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const resultsBody = document.getElementById('search-results-body');
+            resultsBody.innerHTML = '';
+            const filteredRecords = records.filter(record => 
+                (record.petName && record.petName.toLowerCase().includes(searchInput)) || 
+                (record.ownerName && record.ownerName.toLowerCase().includes(searchInput))
+            );
+            filteredRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.petName || ''}</td>
+                    <td>${record.ownerName || ''}</td>
+                    <td>${record.consultDate || ''}</td>
+                `;
+                resultsBody.appendChild(row);
+            });
+        }
+
+        document.getElementById('search-input').addEventListener('input', performSearch);
+
+        function exportToExcel(event) {
+            if (event) event.stopPropagation();
+            const workbook = XLSX.utils.book_new();
+            
+            // Agrupar registros por nombre de mascota
+            const petGroups = {};
+            records.forEach(record => {
+                const petName = record.petName || 'Sin Nombre';
+                if (!petGroups[petName]) petGroups[petName] = { main: [], consult: [] };
+                if (record.type === 'main') petGroups[petName].main.push(record);
+                else if (record.type === 'consult') petGroups[petName].consult.push(record);
+            });
+
+            // Estilos para las hojas
+            const styleHeader = {
+                font: { bold: true, color: { rgb: 'FFFFFF' } },
+                fill: { fgColor: { rgb: '00796b' } },
+                alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+                border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
+            };
+            const styleCell = {
+                alignment: { horizontal: 'left', vertical: 'center', wrapText: true },
+                border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
+            };
+            const styleSubHeader = {
+                font: { bold: true, color: { rgb: '000000' } },
+                fill: { fgColor: { rgb: 'b2dfdb' } },
+                alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+                border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
+            };
+
+            // Crear una hoja por cada mascota
+            Object.keys(petGroups).forEach(petName => {
+                const petRecords = petGroups[petName];
+                const sheetData = [];
+                
+                // Añadir ficha principal
+                if (petRecords.main.length > 0) {
+                    sheetData.push({ '': 'Ficha Principal' });
+                    sheetData.push({
+                        id: 'ID',
+                        ownerName: 'Nombre del Dueño',
+                        phone: 'Teléfono',
+                        address: 'Dirección',
+                        petName: 'Nombre Mascota',
+                        petColor: 'Color',
+                        species: 'Especie',
+                        breed: 'Raza',
+                        age: 'Edad (años)',
+                        weight: 'Peso (kg)',
+                        consultDate: 'Fecha Consulta',
+                        anamnesis: 'Anamnesis',
+                        diagnosis: 'Diagnóstico',
+                        treatment: 'Tratamiento'
+                    });
+                    sheetData.push(...petRecords.main);
+                    sheetData.push({}); // Línea vacía
+                }
+
+                // Añadir consultas adicionales
+                if (petRecords.consult.length > 0) {
+                    sheetData.push({ '': 'Consultas Adicionales' });
+                    sheetData.push({
+                        id: 'ID',
+                        petName: 'Nombre Mascota',
+                        consultDate: 'Fecha Consulta',
+                        weight: 'Peso (kg)',
+                        age: 'Edad (años)',
+                        anamnesis: 'Anamnesis',
+                        diagnosis: 'Diagnóstico',
+                        treatment: 'Tratamiento'
+                    });
+                    sheetData.push(...petRecords.consult);
+                }
+
+                const worksheet = XLSX.utils.json_to_sheet(sheetData, { skipHeader: true });
+                
+                // Aplicar estilos
+                const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:N1');
+                let rowIndex = 0;
+                if (petRecords.main.length > 0) {
+                    worksheet['A1'].s = styleSubHeader;
+                    for (let col = range.s.c; col <= range.e.c; col++) {
+                        const cellAddress = XLSX.utils.encode_cell({ r: rowIndex + 1, c: col });
+                        worksheet[cellAddress] = worksheet[cellAddress] || {};
+                        worksheet[cellAddress].s = styleHeader;
+                    }
+                    for (let row = rowIndex + 2; row < rowIndex + 2 + petRecords.main.length; row++) {
+                        for (let col = range.s.c; col <= range.e.c; col++) {
+                            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                            if (worksheet[cellAddress]) worksheet[cellAddress].s = styleCell;
+                        }
+                    }
+                    rowIndex += petRecords.main.length + 3;
+                }
+                if (petRecords.consult.length > 0) {
+                    worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: 0 })].s = styleSubHeader;
+                    for (let col = range.s.c; col <= range.e.c; col++) {
+                        const cellAddress = XLSX.utils.encode_cell({ r: rowIndex + 1, c: col });
+                        worksheet[cellAddress] = worksheet[cellAddress] || {};
+                        worksheet[cellAddress].s = styleHeader;
+                    }
+                    for (let row = rowIndex + 2; row < rowIndex + 2 + petRecords.consult.length; row++) {
+                        for (let col = range.s.c; col <= range.e.c; col++) {
+                            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                            if (worksheet[cellAddress]) worksheet[cellAddress].s = styleCell;
+                        }
+                    }
+                }
+
+                // Configurar anchos de columna
+                worksheet['!cols'] = [
+                    { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 30 }, { wch: 20 },
+                    { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 10 },
+                    { wch: 15 }, { wch: 30 }, { wch: 30 }, { wch: 30 }
+                ];
+
+                // Sanitizar nombre de la hoja
+                let sheetName = petName.replace(/[\\/:*?\"<>|]/g, '_').substring(0, 31);
+                XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+            });
+
+            XLSX.writeFile(workbook, 'fichas_veterinarias.xlsx');
+            if (isWheelOpen) toggleWheel();
+        }
+
+        function importFromExcel(event) {
+            if (event) event.stopPropagation();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const newRecords = [];
+                    
+                    // Procesar cada hoja (cada mascota)
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sheet = workbook.Sheets[sheetName];
+                        const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        let currentSection = null;
+                        
+                        sheetData.forEach((row, index) => {
+                            if (row[0] === 'Ficha Principal') {
+                                currentSection = 'main';
+                            } else if (row[0] === 'Consultas Adicionales') {
+                                currentSection = 'consult';
+                            } else if (currentSection && row[0] !== 'ID') {
+                                if (currentSection === 'main' && row.length >= 14) {
+                                    newRecords.push({
+                                        id: row[0] || Date.now() + newRecords.length,
+                                        type: 'main',
+                                        ownerName: row[1] || '',
+                                        phone: row[2] || '',
+                                        address: row[3] || '',
+                                        petName: row[4] || sheetName,
+                                        petColor: row[5] || '',
+                                        species: row[6] || '',
+                                        breed: row[7] || '',
+                                        age: row[8] || '',
+                                        weight: row[9] || '',
+                                        consultDate: row[10] || '',
+                                        anamnesis: row[11] || '',
+                                        diagnosis: row[12] || '',
+                                        treatment: row[13] || ''
+                                    });
+                                } else if (currentSection === 'consult' && row.length >= 8) {
+                                    newRecords.push({
+                                        id: row[0] || Date.now() + newRecords.length,
+                                        type: 'consult',
+                                        petName: row[1] || sheetName,
+                                        consultDate: row[2] || '',
+                                        weight: row[3] || '',
+                                        age: row[4] || '',
+                                        anamnesis: row[5] || '',
+                                        diagnosis: row[6] || '',
+                                        treatment: row[7] || ''
+                                    });
+                                }
+                            }
+                        });
+                    });
+
+                    records = newRecords;
+                    localStorage.setItem('vetRecords', JSON.stringify(records));
+                    alert('Datos importados exitosamente');
+                    populatePetDropdown();
+                    performSearch();
+                    if (isWheelOpen) toggleWheel();
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        }
+
+        // Inicializar la pantalla principal
+        showScreen('main');
+    </script>
+</body>
+</html>
